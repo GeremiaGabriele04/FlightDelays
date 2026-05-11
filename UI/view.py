@@ -6,9 +6,9 @@ class View(ft.UserControl):
         super().__init__()
         # page stuff
         self._page = page
-        self._page.title = "Template application using MVC and DAO"
+        self._page.title = "TdP - Flights Manager 2026"
         self._page.horizontal_alignment = 'CENTER'
-        self._page.theme_mode = ft.ThemeMode.DARK
+        self._page.theme_mode = ft.ThemeMode.LIGHT
         # controller (it is not initialized. Must be initialized in the main, after the controller is created)
         self._controller = None
         # graphical elements
@@ -20,8 +20,47 @@ class View(ft.UserControl):
 
     def load_interface(self):
         # title
-        self._title = ft.Text("Hello World", color="blue", size=24)
+        self._title = ft.Text("TdP - Flights Manager 2026", color="blue", size=24)
         self._page.controls.append(self._title)
+
+        #ROW1
+        self._txtInCMin = ft.TextField(label="N min compagnie")
+        self._btnAnalizzaAeroporti = ft.ElevatedButton(text="Analizza Aeroporti",
+                                                       on_click = self._controller.handleAnalizza)
+        row1 = ft.Row([
+            ft.Container(None, width=250),
+            ft.Container(self._txtInCMin, width=250),
+            ft.Container(self._btnAnalizzaAeroporti, width=250)],
+            alignment=ft.MainAxisAlignment.CENTER
+        )
+
+        # ROW2
+        self._ddAeroportoP = ft.TextField(label="Aeroporto di partenza")
+        self._btnAeroportiConnessi = ft.ElevatedButton(text="Analizza Aeroporti",
+                                                       on_click=self._controller.handleAnalizza)
+        row2 = ft.Row([
+            ft.Container(None, width=250),
+            ft.Container(self._txtInCMin, width=250),
+            ft.Container(self._btnAnalizzaAeroporti, width=250)],
+            alignment=ft.MainAxisAlignment.CENTER
+        )
+
+        # ROW3
+        self._txtInCMin = ft.TextField(label="N min compagnie")
+        self._btnAnalizzaAeroporti = ft.ElevatedButton(text="Analizza Aeroporti",
+                                                       on_click=self._controller.handleAnalizza)
+        row3 = ft.Row([
+            ft.Container(None, width=250),
+            ft.Container(self._txtInCMin, width=250),
+            ft.Container(self._btnAnalizzaAeroporti, width=250)],
+            alignment=ft.MainAxisAlignment.CENTER
+        )
+
+        self._page.add(row1, row2, row3)
+        self.update_page()
+
+
+
 
         #ROW with some controls
         # text field for the name
