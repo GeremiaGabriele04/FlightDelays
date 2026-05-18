@@ -1,3 +1,5 @@
+import copy
+
 import networkx as nx
 
 from database.DAO import DAO
@@ -10,6 +12,39 @@ class Model:
         self._idMapAirports = {}
         for a in self._airports:
             self._idMapAirports[a.ID] = a
+
+    def getCamminoOttimo(self, v0, v1, t):
+        self._bestCammino = []
+        self._bestScore = 0
+
+        parziale = [v0]
+
+        self._ricorsione(parziale, v1, t)
+
+    def _ricorsione(self, parziale, v1, t):
+        #verifico se parziale è una soluzione valida, ed in caso la salvo
+        if parziale[-1] == v1: #allora potenzialmente è una sol accettabile
+            if self._getScore(parziale) > self._bestScore:
+                self._bestCammino = copy.deepcopy(parziale)
+                self._bestScore = self._getScore(parziale)
+
+        #verifico se ha senso continuare ad aggiungere elementi in parziale, oppure esco
+        if len(parziale) == t+1: #allora parziale ha gia raggiunto il num max di tratte
+            return
+
+        #espando parziale e faccio ricorsione con backtracking
+        for n in self._graph.neighbors(parziale[-1]):
+            if n not in parziale:
+                parziale.append(n)
+                self._ricorsione(parziale, v1, t)
+                parziale.pop()
+
+    def _getScore(self, parziale):
+        sumPesi = 0
+        for i in range(0, len(parziale) - 1):
+            sumPesi += self._graph[parziale[i]][parziale[i+1]]["weight"]
+        return sumPesi
+
 
     def buildGraph(self, nMin):
         nodes = DAO.getAllNodes(nMin, self._idMapAirports)
@@ -48,3 +83,52 @@ class Model:
         nodes = list(self._graph.nodes)
         nodes.sort(key=lambda x: x.IATA_CODE)
         return nodes
+
+    def getViciniOrdinati(self, source):
+        #restituisce tutti i vicini di source ordinati per peso dell'arco che collega source con i vicini
+        vicini = self._graph.neighbors(source)
+        #lo ordine per peso
+        viciniT = []
+        for v in vicini:
+            viciniT.append((v, self._graph[source][v]["weight"]))
+        viciniT.sort(key=lambda x: x[1]) #(x[0], x[1])
+        return viciniT
+
+    def hasPath(self, v0, v1):
+        #restituisce true se esiste un qualche cammino tra v0 e v1, altrimenti false
+        nx.node_connected_component(self._graph, v0)
+        #verifico se è presente v1 nella lista
+        if v1 in nx.node_connected_component(self._graph, v0):
+            return True
+        else:
+            return False
+
+    def getPath(self, v0, v1):
+        #per ogni chiave (nodo) ho associato il nodo precedente a quello in chiave
+
+        #V1
+        #bfs : cammino minimo in termini di numero di archi
+        #dictOfPredecessors = dict(nx.bfs_predecessors(self._graph, v0))
+        #path = [v1]
+        #while path[0] != v0:
+           #path.insert(0, dictOfPredecessors[path[0]])
+
+        #V2
+        # dfs : cammino minimo un po' piu lungo
+        #dictOfPredecessors = dict(nx.dfs_predecessors(self._graph, v0))
+        #path = [v1]
+        #while path[0] != v0:
+         #   path.insert(0, dictOfPredecessors[path[0]])
+
+        #V3
+        #path = nx.shortest_path(v0, v1)
+
+        #V4
+        #dijkstra: minimizza in termini di peso degli archi
+        path = nx.dijkstra_path(self._graph, v0, v1)
+        return path
+
+
+
+
+

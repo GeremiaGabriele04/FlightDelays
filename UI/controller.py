@@ -13,8 +13,8 @@ class Controller:
     def handleAnalizza(self, e):
         cMinTxt = self._view._txtInCMin.value
         if cMinTxt == "":
-            self._view._txtResults.controls.clear()
-            self._view._txtResults.controls.append(
+            self._view.txtResults.controls.clear()
+            self._view.txtResults.controls.append(
                 ft.Text("Inserire un valore numerico per numero minimo compagnie.", color="red"))
             self._view.update_page()
             return
@@ -22,15 +22,15 @@ class Controller:
         try:
             cMin = int(cMinTxt)
         except ValueError:
-            self._view._txtResults.controls.clear()
-            self._view._txtResults.controls.append(
+            self._view.txtResults.controls.clear()
+            self._view.txtResults.controls.append(
                 ft.Text("Inserire un valore intero per numero minimo compagnie.", color="red"))
             self._view.update_page()
             return
 
         if cMin <= 0:
-            self._view._txtResults.controls.clear()
-            self._view._txtResults.controls.append(
+            self._view.txtResults.controls.clear()
+            self._view.txtResults.controls.append(
                 ft.Text("Il filtro sul numero di compagnie deve esseere un intero positivo.", color="red"))
             self._view.update_page()
             return
@@ -41,18 +41,75 @@ class Controller:
         allNodes = self._model.getAllNodes()
         self._fillDropDown(allNodes)
 
-        self._view._txtResults.controls.clear()
-        self._view._txtResults.controls.append(
+        self._view.txtResults.controls.clear()
+        self._view.txtResults.controls.append(
             ft.Text("Grafo correttamente creato.", color="green"))
-        self._view._txtResults.controls.append(
+        self._view.txtResults.controls.append(
             ft.Text(f"Il grafo contiene {nNodes} nodi e {nEdges} archi.", color="green"))
         self._view.update_page()
 
     def handleConnessi(self, e):
-        pass
+        if self._choicePartenza is None:
+            self._view.txtResults.controls.clear()
+            self._view.txtResults.controls.append("Attenzione! Per utilizzare questo metodo occorre selezionare un aeroporto di partenza", color="red")
+            self._view.update_page()
+            return
+
+        viciniT = self._model.getViciniOrdinati(self._choicePartenza)
+        self._view.txtResults.controls.clear()
+        for v in viciniT:
+            self._view.txtResults.controls.append(
+                ft.Text(f"{v[0]} - peso: {v[1]}")
+            )
+        self._view.update_page()
+
+
+    def handleTestConnessione(self, e):
+        if self._choicePartenza is None:
+            self._view.txtResults.controls.clear()
+            self._view.txtResults.controls.append(
+                "Attenzione! Per utilizzare questo metodo occorre selezionare un aeroporto di partenza", color="red")
+            self._view.update_page()
+            return
+
+        if self._choiceArrivo is None:
+            self._view.txtResults.controls.clear()
+            self._view.txtResults.controls.append("Attenzione! Per utilizzare questo metodo occorre selezionare un aeroporto di arrivo", color="red")
+            self._view.update_page()
+            return
+
+        if not self._model.hasPath(self._choicePartenza, self._choiceArrivo):
+            self._view.txtResults.controls.clear()
+            self._view.txtResults.controls.append(ft.Text(f"Non ho trovato un cammino tra {self._choicePartenza} e {self._choiceArrivo}"))
+            self._view.update_page()
+            return
+
+        path = self._model.getPath(self._choicePartenza, self._choiceArrivo)
+        self._view.txtResults.controls.clear()
+        self._view.txtResults.controls.append(ft.Text("Di seguito il cammino che ho trovato:"))
+        for p in path:
+            self._view.txtResults.controls.append(ft.Text(p))
+        self._view.update_page()
 
     def handleCerca(self, e):
-        pass
+        t = self._view._txtInNTratteMax.value
+
+        try:
+            tInt = int(t)
+        except ValueError:
+            self._view.txtResults.controls.clear()
+            self._view.txtResults.controls.append(ft.Text("Inserisci un numero intero positivo", color="red"))
+            self._view.update_page()
+            return
+
+        path, score = self._model.getCamminoOttimo(self._choicePartenza, self._choiceArrivo, tInt)
+        self._view.txtResults.controls.clear()
+        self._view.txtResults.controls.append(ft.Text("Cammino trovato!", color="green"))
+        self._view.txtResults.controls.append(ft.Text(f"Il cammino ha peso {score} e contiene i seguenti aeroporti:"))
+        for p in path:
+            self._view.txtResults.controls.append(ft.Text(p))
+        self._view.update_page()
+
 
     def _fillDropDown(self, allNodes):
         for n in allNodes:
