@@ -12,6 +12,8 @@ class Model:
         self._idMapAirports = {}
         for a in self._airports:
             self._idMapAirports[a.ID] = a
+        self._bestCammino = []
+        self._bestScore = 0
 
     def getCamminoOttimo(self, v0, v1, t):
         self._bestCammino = []
@@ -20,6 +22,7 @@ class Model:
         parziale = [v0]
 
         self._ricorsione(parziale, v1, t)
+        return self._bestCammino, self._bestScore
 
     def _ricorsione(self, parziale, v1, t):
         #verifico se parziale è una soluzione valida, ed in caso la salvo
@@ -41,7 +44,7 @@ class Model:
 
     def _getScore(self, parziale):
         sumPesi = 0
-        for i in range(0, len(parziale) - 1):
+        for i in range(0, len(parziale)-1):
             sumPesi += self._graph[parziale[i]][parziale[i+1]]["weight"]
         return sumPesi
 
@@ -91,17 +94,17 @@ class Model:
         viciniT = []
         for v in vicini:
             viciniT.append((v, self._graph[source][v]["weight"]))
-        viciniT.sort(key=lambda x: x[1]) #(x[0], x[1])
+        viciniT.sort(key=lambda x: x[1], reverse=True) #(x[0], x[1])
         return viciniT
 
     def hasPath(self, v0, v1):
         #restituisce true se esiste un qualche cammino tra v0 e v1, altrimenti false
-        nx.node_connected_component(self._graph, v0)
+        return v1 in nx.node_connected_component(self._graph, v0)
         #verifico se è presente v1 nella lista
-        if v1 in nx.node_connected_component(self._graph, v0):
-            return True
-        else:
-            return False
+        #if v1 in nx.node_connected_component(self._graph, v0):
+        #    return True
+        #else:
+        #    return False
 
     def getPath(self, v0, v1):
         #per ogni chiave (nodo) ho associato il nodo precedente a quello in chiave

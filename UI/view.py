@@ -7,16 +7,13 @@ class View(ft.UserControl):
         # page stuff
         self._page = page
         self._page.title = "TdP - Flights Manager 2026"
+        self._page.window_width = 1000
         self._page.horizontal_alignment = 'CENTER'
         self._page.theme_mode = ft.ThemeMode.LIGHT
         # controller (it is not initialized. Must be initialized in the main, after the controller is created)
         self._controller = None
         # graphical elements
         self._title = None
-        self.txt_name = None
-        self.btn_hello = None
-        self.txtResults = None
-        self.txt_container = None
 
     def load_interface(self):
         # title
@@ -30,34 +27,37 @@ class View(ft.UserControl):
         row1 = ft.Row([
             ft.Container(None, width=250),
             ft.Container(self._txtInCMin, width=250),
-            ft.Container(self._btnAnalizzaAeroporti, width=250)],
+            ft.Container(self._btnAnalizzaAeroporti, width=250),
+            ft.Container(None, width=250)],
             alignment=ft.MainAxisAlignment.CENTER
         )
 
         # ROW2
-        self._ddAeroportoP = ft.TextField(label="Aeroporto di partenza")
+        self._ddAeroportoP = ft.Dropdown(label="Aeroporto di partenza")
         self._btnAeroportiConnessi = ft.ElevatedButton(text="Aeroporti Connessi",
                                                        on_click=self._controller.handleConnessi)
+        self._ddAeroportoA = ft.Dropdown(label="Aeroporto di destinazione")
+        self._btnTestConnessione = ft.ElevatedButton(text="Test Connessione",
+                                                     on_click=self._controller.handleTestConnessione)
+
         row2 = ft.Row([
-            ft.Container(None, width=250),
             ft.Container(self._ddAeroportoP, width=250),
-            ft.Container(self._btnAeroportiConnessi, width=250)],
+            ft.Container(self._btnAeroportiConnessi, width=150),
+            ft.Container(self._ddAeroportoA, width=250),
+            ft.Container(self._btnTestConnessione, width=150)],
             alignment=ft.MainAxisAlignment.CENTER
         )
 
         # ROW3
-        self._ddAeroportoA = ft.Dropdown(label="Aeroporto di destinazione")
         self._txtInNTratteMax = ft.TextField(label="Num Tratte Max")
         self._btnCercaItinerario = ft.ElevatedButton(text="Cerca Itinerario",
                                                      on_click=self._controller.handleCerca)
-        self._btnTestConnessione = ft.ElevatedButton(text="Test Connessione",
-                                                     on_click=self._controller.handleTestConnessione)
 
         row3 = ft.Row([
-            ft.Container(self._ddAeroportoA, width=250),
+            ft.Container(None, width=250),
             ft.Container(self._txtInNTratteMax, width=250),
             ft.Container(self._btnCercaItinerario, width=250),
-            ft.Container(self._btnTestConnessione, width=250)],
+            ft.Container(None, width=250)],
             alignment=ft.MainAxisAlignment.CENTER
         )
 
